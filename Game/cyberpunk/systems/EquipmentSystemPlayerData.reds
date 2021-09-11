@@ -19,8 +19,13 @@ public final func OnRestored() -> Void {
 // Add extra system replacement slots.
 @addMethod(EquipmentSystemPlayerData)
 private func OverloadSystemReplacementCW() -> Void {
-	let systemNumSlots: Int32 = SystemEx.NumberOfSlots();
 	let systemAreaIndex: Int32 = this.GetEquipAreaIndex(gamedataEquipmentArea.SystemReplacementCW);
+
+	if ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots) < 1 {
+		return;
+	}
+
+	let systemNumSlots: Int32 = SystemEx.NumberOfSlots();
 	let emptyEquipSlot: SEquipSlot;
 
 	while ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots) < systemNumSlots {

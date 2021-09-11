@@ -6,7 +6,7 @@ module SystemEx
 
 public abstract class SystemEx {
 	// Mod version
-	public static func Version() -> String = "1.0.0"
+	public static func Version() -> String = "1.0.1"
 
 	// Number of system replacement slots
 	// Although you can change the number and it will add extra slots
