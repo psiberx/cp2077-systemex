@@ -5,7 +5,7 @@ public final static func IsCyberdeckEquipped(owner: ref<GameObject>) -> Bool {
 	return GameInstance.GetStatsSystem(owner.GetGame()).GetStatBoolValue(Cast(owner.GetEntityID()), gamedataStatType.HasCyberdeck);
 }
 
-// The helper that determines if the player has Sandevistan installed.
+// Determine if a given item is Sandevistan.
 @addMethod(EquipmentSystem)
 public final static func IsItemSandevistan(itemID: ItemID) -> Bool {
 	let itemRecord: wref<Item_Record> = RPGManager.GetItemRecord(itemID);
@@ -13,7 +13,7 @@ public final static func IsItemSandevistan(itemID: ItemID) -> Bool {
 	return ArrayContains(itemTags, n"Sandevistan");
 }
 
-// The helper that determines if the player has Berserk installed.
+// Determine if a given item is Berserk.
 @addMethod(EquipmentSystem)
 public final static func IsItemBerserk(itemID: ItemID) -> Bool {
 	let itemRecord: wref<Item_Record> = RPGManager.GetItemRecord(itemID);
@@ -21,7 +21,7 @@ public final static func IsItemBerserk(itemID: ItemID) -> Bool {
 	return ArrayContains(itemTags, n"Berserk");
 }
 
-// The helper that determines if the player has ans Operating System installed.
+// Determine if a given item is an Operating System.
 @addMethod(EquipmentSystem)
 public final static func IsItemOperatingSystem(itemID: ItemID) -> Bool {
 	let itemRecord: wref<Item_Record> = RPGManager.GetItemRecord(itemID);
