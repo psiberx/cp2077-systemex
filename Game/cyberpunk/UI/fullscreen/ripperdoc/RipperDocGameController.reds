@@ -19,7 +19,7 @@ private final func UpdateCWAreaGrid(selectedArea: gamedataEquipmentArea) -> Void
 	wrappedMethod(selectedArea);
 
 	if Equals(this.m_screen, CyberwareScreenType.Inventory) {
-		for minigridController in this.m_cyberareGrids {
+		for minigridController in this.m_cybewareGrids {
 			if Equals(minigridController.GetEquipementArea(), selectedArea) {
 				minigridController.UpdateTitles(this.GetAmountOfModsInArea(selectedArea), this.m_screen);
 				break;

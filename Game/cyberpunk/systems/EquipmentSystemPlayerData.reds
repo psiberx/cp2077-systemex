@@ -77,10 +77,10 @@ public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTags: array<
 
 // Override equip method to unequip conflicting items from all slots with extended rules.
 @wrapMethod(EquipmentSystemPlayerData)
-private final func EquipItem(itemID: ItemID, slotIndex: Int32, opt addToInventory: Bool, opt blockActiveSlotsUpdate: Bool, opt forceEquipWeapon: Bool) -> Void {
+private final func EquipItem(itemID: ItemID, slotIndex: Int32, opt blockActiveSlotsUpdate: Bool, opt forceEquipWeapon: Bool) -> Void {
 	this.UnequipConflictingItems(itemID);
 
-	wrappedMethod(itemID, slotIndex, addToInventory, blockActiveSlotsUpdate, forceEquipWeapon);
+	wrappedMethod(itemID, slotIndex, blockActiveSlotsUpdate, forceEquipWeapon);
 }
 
 // Unequip conflicting items with extended rules.

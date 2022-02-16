@@ -5,7 +5,7 @@
 // Originally the game cancels Sandevistan effect when the player enters Focus Mode.
 @wrapMethod(TimeDilationFocusModeDecisions)
 protected final const func EnterCondition(const stateContext: ref<StateContext>, const scriptInterface: ref<StateGameScriptInterface>) -> Bool {
-	if !this.IsPlayerInFocusMode(stateContext, scriptInterface) {
+	if !this.IsInVisionModeActiveState(stateContext, scriptInterface) {
 		if this.IsTimeDilationActive(stateContext, scriptInterface, TimeDilationHelper.GetFocusModeKey()) {
 			let timeSystem: ref<TimeSystem> = scriptInterface.GetTimeSystem();
 			let timeDilation: Float = TweakDBInterface.GetFloat(t"timeSystem.focusModeTimeDilation.timeDilation", 0.0);
