@@ -16,20 +16,41 @@ public final func OnRestored() -> Void {
 	wrappedMethod();
 }
 
+// Find the area index in the equipment data.
+@addMethod(EquipmentSystemPlayerData)
+private func GetEquipAreaIndexByType(areaType: gamedataEquipmentArea) -> Int32 {
+	let i: Int32 = 0;
+	while i < ArraySize(this.m_equipment.equipAreas) {
+		if Equals(this.m_equipment.equipAreas[i].areaType, areaType) {
+			return i;
+		}
+		i += 1;
+	}
+	return -1;
+}
+
 // Add extra system replacement slots.
 @addMethod(EquipmentSystemPlayerData)
 private func OverloadSystemReplacementCW() -> Void {
-	let systemAreaIndex: Int32 = this.GetEquipAreaIndex(gamedataEquipmentArea.SystemReplacementCW);
+	let systemAreaIndex: Int32 = this.GetEquipAreaIndexByType(gamedataEquipmentArea.SystemReplacementCW);
 
 	if ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots) < 1 {
 		return;
 	}
 
-	let systemNumSlots: Int32 = SystemEx.NumberOfSlots();
-	let emptyEquipSlot: SEquipSlot;
+	let desiredNumSlots: Int32 = SystemEx.NumberOfSlots();
+	let currentNumSlots: Int32 = ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots);
 
-	while ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots) < systemNumSlots {
-		ArrayPush(this.m_equipment.equipAreas[systemAreaIndex].equipSlots, emptyEquipSlot);
+	if (desiredNumSlots >= 1 && desiredNumSlots != currentNumSlots) {
+		if (desiredNumSlots < currentNumSlots) {
+			let slotIndex: Int32 = desiredNumSlots + 1;
+			while (slotIndex <= currentNumSlots) {
+				this.UnequipItem(systemAreaIndex, slotIndex);
+				slotIndex += 1;
+			}
+		}
+
+		ArrayResize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots, desiredNumSlots);
 	}
 }
 

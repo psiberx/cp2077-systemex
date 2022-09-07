@@ -3,7 +3,7 @@
 // Originally the game duplicates the selected item multiple times for each slot
 // available for the current equipment area.
 @replaceMethod(InventoryCyberwareItemChooser)
-protected func RefreshMainItem() -> Void {
+protected func RefreshMainItem(opt isClothingSetEquipped: Bool, opt clothingSetIndex: Int32, opt showTransmogedIcon: Bool) -> Void {
 	let itemID: ItemID;
 	let slot: ref<InventoryItemDisplayController>;
 	let numSlots: Int32 = 1; // this.inventoryDataManager.GetNumberOfSlots(this.equipmentArea);
