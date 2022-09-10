@@ -5,13 +5,13 @@ import SystemEx.*
 private final func InitializeEquipment() -> Void {
 	wrappedMethod();
 
-	this.OverloadSystemReplacementCW();
+	this.OverloadCWSlots();
 }
 
 // Override the initialization of the equipment data loaded from the save file to add extra system replacement slots.
 @wrapMethod(EquipmentSystemPlayerData)
 public final func OnRestored() -> Void {
-	this.OverloadSystemReplacementCW();
+	this.OverloadCWSlots();
 
 	wrappedMethod();
 }
@@ -20,37 +20,67 @@ public final func OnRestored() -> Void {
 @addMethod(EquipmentSystemPlayerData)
 private func GetEquipAreaIndexByType(areaType: gamedataEquipmentArea) -> Int32 {
 	let i: Int32 = 0;
+
 	while i < ArraySize(this.m_equipment.equipAreas) {
 		if Equals(this.m_equipment.equipAreas[i].areaType, areaType) {
 			return i;
 		}
+
 		i += 1;
 	}
+
 	return -1;
 }
 
-// Add extra system replacement slots.
+// Add extra cyberware slots.
 @addMethod(EquipmentSystemPlayerData)
-private func OverloadSystemReplacementCW() -> Void {
-	let systemAreaIndex: Int32 = this.GetEquipAreaIndexByType(gamedataEquipmentArea.SystemReplacementCW);
+private func OverloadCWSlots() -> Void {
+	let systemEx = SystemEx.GetInstance(this.m_owner.GetGame());
+	let areaTypes: array<gamedataEquipmentArea> = SystemEx.GetOverloadedEquipmentAreaTypes();
 
-	if ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots) < 1 {
+	if ArraySize(areaTypes) < 1 {
 		return;
 	}
 
-	let desiredNumSlots: Int32 = SystemEx.NumberOfSlots();
-	let currentNumSlots: Int32 = ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots);
+	for areaType in areaTypes {
+		this.OverloadCWSlots(systemEx, areaType);
+	}
+}
 
-	if (desiredNumSlots >= 1 && desiredNumSlots != currentNumSlots) {
+@addMethod(EquipmentSystemPlayerData)
+private func OverloadCWSlots(systemEx: ref<SystemEx>, areaType: gamedataEquipmentArea) -> Void {
+	let areaIdx: Int32 = this.GetEquipAreaIndexByType(areaType);
+
+	if areaIdx < 0 {
+		SystemEx.Debug(s"areaType \(areaType) not found");
+		return;
+	}
+
+	let currentNumSlots: Int32 = ArraySize(this.m_equipment.equipAreas[areaIdx].equipSlots);
+
+	if currentNumSlots < 1 {
+		SystemEx.Debug(s"areaType \(areaType) has insufficient number of slots: \(currentNumSlots)");
+		return;
+	}
+
+	let desiredNumSlots: Int32 = systemEx.GetSlotsCount(areaType);
+
+	if desiredNumSlots < 1 {
+		SystemEx.Debug(s"areaType \(areaType) has insufficient desired number of slots: \(desiredNumSlots)");
+		return;
+	}
+
+	if (desiredNumSlots != currentNumSlots) {
 		if (desiredNumSlots < currentNumSlots) {
 			let slotIndex: Int32 = desiredNumSlots + 1;
+
 			while (slotIndex <= currentNumSlots) {
-				this.UnequipItem(systemAreaIndex, slotIndex);
+				this.UnequipItem(areaIdx, slotIndex);
 				slotIndex += 1;
 			}
 		}
 
-		ArrayResize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots, desiredNumSlots);
+		ArrayResize(this.m_equipment.equipAreas[areaIdx].equipSlots, desiredNumSlots);
 	}
 }
 
@@ -70,6 +100,7 @@ public final const func GetActiveItem(equipArea: gamedataEquipmentArea) -> ItemI
 @addMethod(EquipmentSystemPlayerData)
 public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTag: CName) -> ItemID {
 	let requiredTags: array<CName>;
+
 	ArrayPush(requiredTags, requiredTag);
 
 	return this.GetActiveItem(equipArea, requiredTags);
@@ -88,7 +119,7 @@ public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTags: array<
 		if ItemID.IsValid(itemID) && this.CheckTagsInItem(itemID, requiredTags) {
 			return this.GetItemInEquipSlot(equipAreaIndex, slotIndex);
 		}
-		
+
 		slotIndex += 1;
 	}
 
