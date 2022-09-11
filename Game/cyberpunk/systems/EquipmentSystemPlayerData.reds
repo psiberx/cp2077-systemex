@@ -36,6 +36,9 @@ private func GetEquipAreaIndexByType(areaType: gamedataEquipmentArea) -> Int32 {
 @addMethod(EquipmentSystemPlayerData)
 private func OverloadCWSlots() -> Void {
 	let systemEx = SystemEx.GetInstance(this.m_owner.GetGame());
+
+	systemEx.Initialize();
+
 	let areaTypes: array<gamedataEquipmentArea> = SystemEx.GetOverloadedEquipmentAreaTypes();
 
 	if ArraySize(areaTypes) < 1 {
@@ -43,12 +46,12 @@ private func OverloadCWSlots() -> Void {
 	}
 
 	for areaType in areaTypes {
-		this.OverloadCWSlots(systemEx, areaType);
+		this.OverloadCWSlotType(systemEx, areaType);
 	}
 }
 
 @addMethod(EquipmentSystemPlayerData)
-private func OverloadCWSlots(systemEx: ref<SystemEx>, areaType: gamedataEquipmentArea) -> Void {
+private func OverloadCWSlotType(systemEx: ref<SystemEx>, areaType: gamedataEquipmentArea) -> Void {
 	let areaIdx: Int32 = this.GetEquipAreaIndexByType(areaType);
 
 	if areaIdx < 0 {

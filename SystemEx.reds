@@ -5,19 +5,39 @@
 module SystemEx
 
 public class SystemEx extends ScriptableSystem {
-	public let slots: ref<SlotsConfig>;
+	private let slots: ref<SlotsConfig>;
 
 	public static func Version() -> String = "1.0.3"
+
+	public static func Debug(const str: script_ref<String>) -> Void {
+		LogChannel(n"DEBUG", s"[SystemEx] \(str)");
+	}
+
+	public static func GetOverloadedEquipmentAreaTypes() -> array<gamedataEquipmentArea> {
+		return SlotsConfig.GetOverloadedEquipmentAreaTypes();
+	}
 
 	public static func GetInstance(game: GameInstance) -> ref<SystemEx> {
 		return GameInstance.GetScriptableSystemsContainer(game).Get(n"SystemEx.SystemEx") as SystemEx;
 	}
 
-	public static final func Debug(const str: script_ref<String>) -> Void {
-		LogChannel(n"DEBUG", s"[SystemEx] \(str)");
+	public func Initialize() -> Void {
+		if this.slots != null {
+			return;
+		}
+
+		this.slots = new SlotsConfig();
+
+		SystemEx.Debug(s"v\(SystemEx.Version()) initialized");
 	}
 
-	public static final func GetOverloadedEquipmentAreaTypes() -> array<gamedataEquipmentArea> = [
+	public func GetSlotsCount(areaType: gamedataEquipmentArea) -> Int32 {
+		return this.slots.GetSlotsCount(areaType);
+	}
+}
+
+class SlotsConfig {
+	public static func GetOverloadedEquipmentAreaTypes() -> array<gamedataEquipmentArea> = [
 		gamedataEquipmentArea.ArmsCW,
 		gamedataEquipmentArea.CardiovascularSystemCW,
 		gamedataEquipmentArea.EyesCW,
@@ -29,49 +49,8 @@ public class SystemEx extends ScriptableSystem {
 		gamedataEquipmentArea.MusculoskeletalSystemCW,
 		gamedataEquipmentArea.NervousSystemCW,
 		gamedataEquipmentArea.SystemReplacementCW
-	];
+	]
 
-	private func OnAttach() -> Void {
-		this.Initialize();
-	}
-
-	private func Initialize() -> Void {
-		this.slots = new SlotsConfig();
-
-		SystemEx.Debug("mod initialized");
-	}
-
-	public final func GetSlotsCount(areaType: gamedataEquipmentArea) -> Int32 {
-		switch (areaType) {
-			case gamedataEquipmentArea.ArmsCW:
-				return this.slots.arms;
-			case gamedataEquipmentArea.CardiovascularSystemCW:
-				return this.slots.cardiovascularSystem;
-			case gamedataEquipmentArea.EyesCW:
-				return this.slots.ocularSystem;
-			case gamedataEquipmentArea.FrontalCortexCW:
-				return this.slots.frontalCortex;
-			case gamedataEquipmentArea.HandsCW:
-				return this.slots.hands;
-			case gamedataEquipmentArea.ImmuneSystemCW:
-				return this.slots.immuneSystem;
-			case gamedataEquipmentArea.IntegumentarySystemCW:
-				return this.slots.integumentarySystem;
-			case gamedataEquipmentArea.LegsCW:
-				return this.slots.legs;
-			case gamedataEquipmentArea.MusculoskeletalSystemCW:
-				return this.slots.musculoSkeletalSystem;
-			case gamedataEquipmentArea.NervousSystemCW:
-				return this.slots.nervousSystem;
-			case gamedataEquipmentArea.SystemReplacementCW:
-				return this.slots.systemReplacement;
-			default:
-				return -1;
-		}
-	}
-}
-
-class SlotsConfig {
 	@runtimeProperty("ModSettings.mod", "System-Ex")
 	@runtimeProperty("ModSettings.displayName", "Operating System")
 	@runtimeProperty("ModSettings.step", "1")
@@ -152,4 +131,33 @@ class SlotsConfig {
 	@runtimeProperty("ModSettings.min", "1")
 	@runtimeProperty("ModSettings.max", "2")
 	public let legs: Int32 = 1;
+
+	public func GetSlotsCount(areaType: gamedataEquipmentArea) -> Int32 {
+		switch (areaType) {
+			case gamedataEquipmentArea.ArmsCW:
+				return this.arms;
+			case gamedataEquipmentArea.CardiovascularSystemCW:
+				return this.cardiovascularSystem;
+			case gamedataEquipmentArea.EyesCW:
+				return this.ocularSystem;
+			case gamedataEquipmentArea.FrontalCortexCW:
+				return this.frontalCortex;
+			case gamedataEquipmentArea.HandsCW:
+				return this.hands;
+			case gamedataEquipmentArea.ImmuneSystemCW:
+				return this.immuneSystem;
+			case gamedataEquipmentArea.IntegumentarySystemCW:
+				return this.integumentarySystem;
+			case gamedataEquipmentArea.LegsCW:
+				return this.legs;
+			case gamedataEquipmentArea.MusculoskeletalSystemCW:
+				return this.musculoSkeletalSystem;
+			case gamedataEquipmentArea.NervousSystemCW:
+				return this.nervousSystem;
+			case gamedataEquipmentArea.SystemReplacementCW:
+				return this.systemReplacement;
+			default:
+				return -1;
+		}
+	}
 }
