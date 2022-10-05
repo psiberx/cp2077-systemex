@@ -4,13 +4,20 @@
 
 module SystemEx
 
-public abstract class SystemEx {
-	// Mod version
-	public static func Version() -> String = "1.0.3"
+public class SystemEx extends ScriptableSystem {
+	private let m_settings: ref<Settings>;
 
-	// Number of system replacement slots
-	// [3] To use Cyberdeck, Operating System, and TechDeck (Drone Companions Mod) at the same time
-	// [2] To use Cyberdeck and Operating System at the same time
-	// [1] To remove extra slots from the player if you want to uninstall the mod
-	public static func NumberOfSlots() -> Int32 = 2
+	private func OnAttach() -> Void {
+		this.m_settings = new Settings();
+	}
+
+	public func GetVersion() -> String = "1.0.4"
+
+	public func GetNumberOfSlots() -> Int32 {
+		return this.m_settings.systemReplacementSlots;
+	}
+
+	public static func GetInstance(game: GameInstance) -> ref<SystemEx> {
+		return GameInstance.GetScriptableSystemsContainer(game).Get(n"SystemEx.SystemEx") as SystemEx;
+	}
 }

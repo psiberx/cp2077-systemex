@@ -38,7 +38,7 @@ private func OverloadSystemReplacementCW() -> Void {
 		return;
 	}
 
-	let desiredNumSlots: Int32 = SystemEx.NumberOfSlots();
+	let desiredNumSlots: Int32 = SystemEx.GetInstance(this.m_owner.GetGame()).GetNumberOfSlots();
 	let currentNumSlots: Int32 = ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots);
 
 	if (desiredNumSlots >= 1 && desiredNumSlots != currentNumSlots) {
