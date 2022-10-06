@@ -1,17 +1,17 @@
 import SystemEx.*
 
-// Override the initialization of equipment data for a new game to add extra system replacement slots.
+// Override the initialization of equipment data for a new game to add extra slots.
 @wrapMethod(EquipmentSystemPlayerData)
 private final func InitializeEquipment() -> Void {
 	wrappedMethod();
 
-	this.OverloadSystemReplacementCW();
+	SystemEx.GetInstance(this.m_owner.GetGame()).OverloadSlots(this);
 }
 
-// Override the initialization of the equipment data loaded from the save file to add extra system replacement slots.
+// Override the initialization of the equipment data loaded from the save file to add extra slots.
 @wrapMethod(EquipmentSystemPlayerData)
 public final func OnRestored() -> Void {
-	this.OverloadSystemReplacementCW();
+	SystemEx.GetInstance(this.m_owner.GetGame()).OverloadSlots(this);
 
 	wrappedMethod();
 }
@@ -27,31 +27,6 @@ private func GetEquipAreaIndexByType(areaType: gamedataEquipmentArea) -> Int32 {
 		i += 1;
 	}
 	return -1;
-}
-
-// Add extra system replacement slots.
-@addMethod(EquipmentSystemPlayerData)
-private func OverloadSystemReplacementCW() -> Void {
-	let systemAreaIndex: Int32 = this.GetEquipAreaIndexByType(gamedataEquipmentArea.SystemReplacementCW);
-
-	if ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots) < 1 {
-		return;
-	}
-
-	let desiredNumSlots: Int32 = SystemEx.GetInstance(this.m_owner.GetGame()).GetNumberOfSlots();
-	let currentNumSlots: Int32 = ArraySize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots);
-
-	if (desiredNumSlots >= 1 && desiredNumSlots != currentNumSlots) {
-		if (desiredNumSlots < currentNumSlots) {
-			let slotIndex: Int32 = desiredNumSlots + 1;
-			while (slotIndex <= currentNumSlots) {
-				this.UnequipItem(systemAreaIndex, slotIndex);
-				slotIndex += 1;
-			}
-		}
-
-		ArrayResize(this.m_equipment.equipAreas[systemAreaIndex].equipSlots, desiredNumSlots);
-	}
 }
 
 // Override how the active item is resolved for the system replacement slot so that
