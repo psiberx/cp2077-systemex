@@ -8,7 +8,7 @@ protected final const func EnterCondition(const stateContext: ref<StateContext>,
 	if !this.IsInVisionModeActiveState(stateContext, scriptInterface) {
 		if this.IsTimeDilationActive(stateContext, scriptInterface, TimeDilationHelper.GetFocusModeKey()) {
 			let timeSystem: ref<TimeSystem> = scriptInterface.GetTimeSystem();
-			let timeDilation: Float = TweakDBInterface.GetFloat(t"timeSystem.focusModeTimeDilation.timeDilation", 0.0);
+			//let timeDilation: Float = TweakDBInterface.GetFloat(t"timeSystem.focusModeTimeDilation.timeDilation", 0.0);
 			let easeOutCurve: CName = TweakDBInterface.GetCName(t"timeSystem.focusModeTimeDilation.easeOutCurve", n"");
 			let applyTimeDilationToPlayer: Bool = TweakDBInterface.GetBool(t"timeSystem.focusModeTimeDilation.applyTimeDilationToPlayer", false);
 

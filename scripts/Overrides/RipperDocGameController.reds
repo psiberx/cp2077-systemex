@@ -15,7 +15,7 @@ protected cb func OnGridSpawned(widget: ref<inkWidget>, userData: ref<IScriptabl
 // Override the update / redraw of the cyberware grid so that it correctly displays the number of available mods
 // when there is more than one slot for the equipment area.
 @wrapMethod(RipperDocGameController)
-private final func UpdateCWAreaGrid(selectedArea: gamedataEquipmentArea) -> Void {
+private final func UpdateCWAreaGrid(selectedArea: gamedataEquipmentArea) {
 	wrappedMethod(selectedArea);
 
 	if Equals(this.m_screen, CyberwareScreenType.Inventory) {

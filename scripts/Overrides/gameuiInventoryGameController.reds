@@ -1,7 +1,7 @@
 
 // Make Cyberdeck link on the Inventory screen opens the right slot.
 @wrapMethod(gameuiInventoryGameController)
-private final func SetDeckData() -> Void {
+private final func SetDeckData() {
 	wrappedMethod();
 
 	if inkWidgetRef.IsVisible(this.m_cyberdeckLinkItem) {

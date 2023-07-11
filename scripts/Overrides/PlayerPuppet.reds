@@ -2,7 +2,7 @@
 // Override the Operating System activation so it can correctly detect the installed cyberware.
 // Originally the game can't detect the actual cyberware if it's installed in any slot except the first one.
 @replaceMethod(PlayerPuppet)
-private final func ActivateIconicCyberware() -> Void {
+private final func ActivateIconicCyberware() {
 	let statsSystem: ref<StatsSystem> = GameInstance.GetStatsSystem(this.GetGame());
 	let playerStatsId: StatsObjectID = Cast(this.GetEntityID());
 
