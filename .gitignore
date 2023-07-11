@@ -1,7 +1,7 @@
 /.dev
 /.idea
 /.vscode
-/dist
+/build
 /*.log
 /Debug.reds
 ~$*

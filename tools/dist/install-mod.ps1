@@ -1,4 +1,4 @@
-param ($GameDir, $ReleaseBin, $ProjectName = "EquipmentEx")
+param ($GameDir, $ReleaseBin, $ProjectName = "SystemEx")
 
 $StageDir = "build/package"
 $Version = & $($PSScriptRoot + "\steps\get-version.ps1")
