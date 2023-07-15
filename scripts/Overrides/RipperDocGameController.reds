@@ -1,7 +1,16 @@
-// Adds fluff text to RipperDoc screen to detect if System-EX is active.
+import SystemEx.*
+
+@addField(RipperDocGameController)
+private let m_slotManager: ref<SlotManager>;
+
+// Overrides intitialization of RipperDoc screen to create slot manager
+// and add fluff text for detecting if System-EX is active.
 @wrapMethod(RipperDocGameController)
 private final func Init() {
     wrappedMethod();
+
+	this.m_slotManager = new SlotManager();
+	this.m_slotManager.Initialize(EquipmentSystem.GetData(this.m_player));
 
     if IsDefined(this.m_ripperId) {
         let text = new inkText();
@@ -68,4 +77,58 @@ private final func GetAmountOfModsInArea(equipArea: gamedataEquipmentArea) -> In
 	}
 
 	return modsCount;
+}
+
+@wrapMethod(RipperDocGameController)
+private final func SetInventoryItemButtonHintsHoverOver(displayingData: InventoryItemData) {
+	wrappedMethod(displayingData);
+
+	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) {
+		// let cursorContext = n"Hover";
+		// let cursorData: ref<MenuCursorUserData>;
+
+		if Equals(this.m_mode, RipperdocModes.Default) {
+			let slotState = this.m_slotManager.GetOverridableSlotState(displayingData.EquipmentArea);
+			P(s"\(slotState)");
+
+			if slotState.isOverridable {
+				// cursorData = new MenuCursorUserData();
+				// cursorData.SetAnimationOverride(n"hoverOnHoldToComplete");
+				// cursorContext = n"HoldToComplete";
+
+				if slotState.currentSlots != slotState.defaultSlots {
+					this.m_buttonHintsController.AddButtonHint(n"disassemble_item", 
+						// "[" + GetLocalizedText("Gameplay-Devices-Interactions-Helpers-Hold") + "] " + 
+						GetLocalizedTextByKey(n"Gameplay-Devices-Interactions-Reset"));
+					// cursorData.AddAction(n"disassemble_item");
+				}
+				
+				if slotState.currentSlots < slotState.maxSlots {
+					this.m_buttonHintsController.AddButtonHint(n"upgrade_perk", 
+						// "[" + GetLocalizedText("Gameplay-Devices-Interactions-Helpers-Hold") + "] " + 
+						GetLocalizedTextByKey(n"Gameplay-Devices-Interactions-Override"));
+					// cursorData.AddAction(n"upgrade_perk");
+				}
+			}
+		}
+
+		// this.SetCursorContext(cursorContext, cursorData);
+	}
+}
+
+@wrapMethod(RipperDocGameController)
+protected cb func OnPreviewCyberwareClick(evt: ref<inkPointerEvent>) -> Bool {
+	wrappedMethod(evt);
+
+	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) && Equals(this.m_mode, RipperdocModes.Default) {
+		let areaType = this.GetCyberwareSlotControllerFromTarget(evt).GetEquipmentArea();
+		
+		if evt.IsAction(n"upgrade_perk") {
+			this.m_slotManager.OverrideSlot(areaType);
+			this.UpdateCWAreaGrid(areaType);
+		} else if evt.IsAction(n"disassemble_item") {
+			this.m_slotManager.ResetSlot(areaType);
+			this.UpdateCWAreaGrid(areaType);
+		}
+	}
 }
