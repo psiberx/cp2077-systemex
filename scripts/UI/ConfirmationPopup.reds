@@ -1,7 +1,7 @@
 module SystemEx
 
 enum OperrideAction {
-    Override = 1,
+    Upgrade = 1,
     Reset = 2
 }
 
@@ -41,7 +41,7 @@ public class ConfirmationPopup {
     }
 
     private static func GetActionLabel(action: OperrideAction) -> String {
-        return Equals(action, OperrideAction.Override)
+        return Equals(action, OperrideAction.Upgrade)
             ? GetLocalizedTextByKey(n"UI-Crafting-Upgrade")
             : GetLocalizedTextByKey(n"UI-ResourceExports-Reset");
     }
@@ -55,11 +55,11 @@ public class ConfirmationPopup {
     }
 
     private static func GetFinalSlots(action: OperrideAction, slotState: ref<SlotState>) -> Int32 {
-        return Equals(action, OperrideAction.Override) ? slotState.currentSlots + 1 : slotState.defaultSlots;
+        return Equals(action, OperrideAction.Upgrade) ? slotState.currentSlots + 1 : slotState.defaultSlots;
     }
 
     private static func GetActionPrice(action: OperrideAction) -> Int32 {
-        return Equals(action, OperrideAction.Override) ? SlotConfig.OverridePrice() : SlotConfig.ResetPrice();
+        return Equals(action, OperrideAction.Upgrade) ? SlotConfig.UpgradePrice() : SlotConfig.ResetPrice();
     }
 
     private static func GetAreaName(slotState: ref<SlotState>) -> String {

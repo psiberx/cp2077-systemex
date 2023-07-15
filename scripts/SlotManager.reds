@@ -20,7 +20,7 @@ public class SlotManager {
 		this.m_playerData = playerData;
 	}
 	
-	public func GetOverridableSlotState(areaType: gamedataEquipmentArea) -> ref<SlotState> {
+	public func GetSlotState(areaType: gamedataEquipmentArea) -> ref<SlotState> {
 		let slotState = new SlotState();
 		slotState.areaType = areaType;
 		slotState.areaIndex = this.GetEquipAreaIndex(areaType);
@@ -35,15 +35,15 @@ public class SlotManager {
 			let playerMoney = GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame())
 				.GetItemQuantity(this.m_playerData.m_owner, MarketSystem.Money());
 
-			slotState.canBuyOverride = (playerMoney >= SlotConfig.OverridePrice());
+			slotState.canBuyOverride = (playerMoney >= SlotConfig.UpgradePrice());
 			slotState.canBuyReset = (playerMoney >= SlotConfig.ResetPrice());
 		}
 
 		return slotState;
 	}
 
-	public func OverrideSlot(areaType: gamedataEquipmentArea, opt free: Bool) -> Bool {
-		let slotState = this.GetOverridableSlotState(areaType);
+	public func UpgradeSlot(areaType: gamedataEquipmentArea, opt free: Bool, opt vendor: wref<GameObject>) -> Bool {
+		let slotState = this.GetSlotState(areaType);
 
 		if !slotState.isOverridable || slotState.currentSlots == slotState.maxSlots {
 			return false;
@@ -55,14 +55,20 @@ public class SlotManager {
 
 		ArrayResize(this.m_playerData.m_equipment.equipAreas[slotState.areaIndex].equipSlots, slotState.currentSlots + 1);
 
-		GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame())
-			.RemoveItem(this.m_playerData.m_owner, MarketSystem.Money(), SlotConfig.OverridePrice());
+		if !free {
+			let transactionSystem = GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame());
+			if IsDefined(vendor) {
+				transactionSystem.TransferItem(this.m_playerData.m_owner, vendor, MarketSystem.Money(), SlotConfig.UpgradePrice());
+			} else {
+				transactionSystem.RemoveItem(this.m_playerData.m_owner, MarketSystem.Money(), SlotConfig.UpgradePrice());
+			}
+		}
 
 		return true;
 	}
 
-	public func ResetSlot(areaType: gamedataEquipmentArea, opt free: Bool) -> Bool {
-		let slotState = this.GetOverridableSlotState(areaType);
+	public func ResetSlot(areaType: gamedataEquipmentArea, opt free: Bool, opt vendor: wref<GameObject>) -> Bool {
+		let slotState = this.GetSlotState(areaType);
 
 		if !slotState.isOverridable || slotState.currentSlots == slotState.defaultSlots {
 			return false;
@@ -82,8 +88,14 @@ public class SlotManager {
 
 		ArrayResize(this.m_playerData.m_equipment.equipAreas[slotState.areaIndex].equipSlots, slotState.defaultSlots);
 
-		GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame())
-			.RemoveItem(this.m_playerData.m_owner, MarketSystem.Money(), SlotConfig.ResetPrice());
+		if !free {
+			let transactionSystem = GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame());
+			if IsDefined(vendor) {
+				transactionSystem.TransferItem(this.m_playerData.m_owner, vendor, MarketSystem.Money(), SlotConfig.ResetPrice());
+			} else {
+				transactionSystem.RemoveItem(this.m_playerData.m_owner, MarketSystem.Money(), SlotConfig.ResetPrice());
+			}
+		}
 
 		return true;
 	}

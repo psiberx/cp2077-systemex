@@ -91,7 +91,7 @@ private final func SetInventoryItemButtonHintsHoverOver(displayingData: Inventor
 		// let cursorData: ref<MenuCursorUserData>;
 
 		if Equals(this.m_mode, RipperdocModes.Default) {
-			let slotState = this.m_slotManager.GetOverridableSlotState(displayingData.EquipmentArea);
+			let slotState = this.m_slotManager.GetSlotState(displayingData.EquipmentArea);
 			if slotState.isOverridable {
 				// cursorData = new MenuCursorUserData();
 				// cursorData.SetAnimationOverride(n"hoverOnHoldToComplete");
@@ -123,14 +123,14 @@ protected cb func OnPreviewCyberwareClick(evt: ref<inkPointerEvent>) -> Bool {
 
 	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) && Equals(this.m_mode, RipperdocModes.Default) {
 		let areaType = this.GetCyberwareSlotControllerFromTarget(evt).GetEquipmentArea();
-		let slotState = this.m_slotManager.GetOverridableSlotState(areaType);
+		let slotState = this.m_slotManager.GetSlotState(areaType);
 		
 		switch (true) {
 			case evt.IsAction(n"upgrade_perk"):
 				if slotState.currentSlots < slotState.maxSlots {
 					if slotState.canBuyOverride {
-						this.m_confirmationToken = ConfirmationPopup.Show(this, OperrideAction.Override, slotState);
-						this.m_confirmationToken.RegisterListener(this, n"OnSlotOverrideConfirmed");
+						this.m_confirmationToken = ConfirmationPopup.Show(this, OperrideAction.Upgrade, slotState);
+						this.m_confirmationToken.RegisterListener(this, n"OnSlotUpgradeConfirmed");
 					} else {
 						this.ShowNotEnoughMoneyNotification();
 					}
@@ -159,12 +159,16 @@ protected func ShowNotEnoughMoneyNotification() {
 }
 
 @addMethod(RipperDocGameController)
-protected cb func OnSlotOverrideConfirmed(data: ref<inkGameNotificationData>) -> Bool {
+protected cb func OnSlotUpgradeConfirmed(data: ref<inkGameNotificationData>) -> Bool {
     if ConfirmationPopup.IsConfirmed(data) {
 		let areaType = ConfirmationPopup.GetAreaType(data);
+		let vendor = NotEquals(this.m_VendorDataManager.GetVendorName(), "")
+			? this.m_VendorDataManager.GetVendorInstance()
+			: null;
 
-		this.m_slotManager.OverrideSlot(areaType);
+		this.m_slotManager.UpgradeSlot(areaType, false, vendor);
 		this.UpdateCWAreaGrid(areaType);
+		this.UpdateMoney();
     }
 
 	this.m_confirmationToken = null;
@@ -174,9 +178,13 @@ protected cb func OnSlotOverrideConfirmed(data: ref<inkGameNotificationData>) ->
 protected cb func OnSlotResetConfirmed(data: ref<inkGameNotificationData>) -> Bool {
     if ConfirmationPopup.IsConfirmed(data) {
 		let areaType = ConfirmationPopup.GetAreaType(data);
+		let vendor = NotEquals(this.m_VendorDataManager.GetVendorName(), "")
+			? this.m_VendorDataManager.GetVendorInstance()
+			: null;
 
-		this.m_slotManager.ResetSlot(areaType);
+		this.m_slotManager.ResetSlot(areaType, false, vendor);
 		this.UpdateCWAreaGrid(areaType);
+		this.UpdateMoney();
     }
 
 	this.m_confirmationToken = null;

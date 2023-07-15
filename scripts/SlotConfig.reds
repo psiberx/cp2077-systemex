@@ -1,6 +1,6 @@
 module SystemEx
 
-struct OverridableSlotInfo {
+public struct OverridableSlotInfo {
     public let areaType: gamedataEquipmentArea;
     public let defaultSlots: Int32;
     public let maxSlots: Int32;
@@ -10,7 +10,8 @@ struct OverridableSlotInfo {
 }
 
 public abstract class SlotConfig {
-    public static func OverridePrice() -> Int32 = 10000
+    public static func UpgradePrice() -> Int32 = 10000
+
     public static func ResetPrice() -> Int32 = 5000
 
     public static func OverridableSlots() -> array<OverridableSlotInfo> = [
