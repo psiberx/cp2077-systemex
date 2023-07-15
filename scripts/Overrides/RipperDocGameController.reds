@@ -12,8 +12,8 @@ protected cb func OnGridSpawned(widget: ref<inkWidget>, userData: ref<IScriptabl
 	}
 }
 
-// Override the update / redraw of the cyberware grid so that it correctly displays the number of available mods
-// when there is more than one slot for the equipment area.
+// Overrides initialization of the cyberware grid so that it correctly displays the number of available mods
+// when there is more than one slot per equipment area.
 @wrapMethod(RipperDocGameController)
 private final func UpdateCWAreaGrid(selectedArea: gamedataEquipmentArea) {
 	wrappedMethod(selectedArea);
@@ -28,12 +28,12 @@ private final func UpdateCWAreaGrid(selectedArea: gamedataEquipmentArea) {
 	}
 }
 
-// Calculate the number of mods available for all items in the specified equipment area.
+// Calculates the number of mods available for all items in the specified equipment area.
 @addMethod(RipperDocGameController)
 private final func GetAmountOfModsInArea(equipArea: gamedataEquipmentArea) -> Int32 {
-	let numSlots: Int32 = this.m_InventoryManager.GetNumberOfSlots(equipArea);
-	let slotIndex: Int32 = 0;
-	let modsCount: Int32 = 0;
+	let numSlots = this.m_InventoryManager.GetNumberOfSlots(equipArea);
+	let slotIndex = 0;
+	let modsCount = 0;
 
 	while slotIndex < numSlots {
 		let equippedData: InventoryItemData = this.m_InventoryManager.GetItemDataEquippedInArea(equipArea, slotIndex);

@@ -1,5 +1,4 @@
-
-// Make Cyberdeck link on the Inventory screen opens the right slot.
+// Overrides Cyberdeck link in the Inventory screen to open the correct slot.
 @wrapMethod(gameuiInventoryGameController)
 private final func SetDeckData() {
 	wrappedMethod();

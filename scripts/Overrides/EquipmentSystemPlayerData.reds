@@ -1,24 +1,7 @@
 import SystemEx.*
 
-// Override the initialization of equipment data for a new game to add extra slots.
-@wrapMethod(EquipmentSystemPlayerData)
-private final func InitializeEquipment() {
-	wrappedMethod();
-
-	SlotManager.OverloadSlots(this);
-}
-
-// Override the initialization of the equipment data loaded from the save file to add extra slots.
-@wrapMethod(EquipmentSystemPlayerData)
-public final func OnRestored() {
-	SlotManager.OverloadSlots(this);
-
-	wrappedMethod();
-}
-
-// Override how the active item is resolved for the system replacement slot so that
-// it returns a Cyberdeck installed in any slot.
-// Originally the game always returns the cyberware installed in the first slot.
+// Overrides how the active item is resolved for the system replacement slot so that
+// it returns a Cyberdeck installed in any slot, not just in the first.
 @wrapMethod(EquipmentSystemPlayerData)
 public final const func GetActiveItem(equipArea: gamedataEquipmentArea) -> ItemID {
 	if Equals(equipArea, gamedataEquipmentArea.SystemReplacementCW) {
@@ -28,7 +11,7 @@ public final const func GetActiveItem(equipArea: gamedataEquipmentArea) -> ItemI
 	return wrappedMethod(equipArea);
 }
 
-// Get the active item that has the specified tag.
+// Gets the active item that has the specified tag.
 @addMethod(EquipmentSystemPlayerData)
 public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTag: CName) -> ItemID {
 	let requiredTags: array<CName>;
@@ -37,12 +20,12 @@ public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTag: CName) 
 	return this.GetActiveItem(equipArea, requiredTags);
 }
 
-// Get the active item that has specified tags.
+// Gets the active item that has specified tags.
 @addMethod(EquipmentSystemPlayerData)
 public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTags: array<CName>) -> ItemID {
-	let equipAreaIndex: Int32 = this.GetEquipAreaIndex(equipArea);
-    let numSlots: Int32 = ArraySize(this.m_equipment.equipAreas[equipAreaIndex].equipSlots);
-    let slotIndex: Int32 = 0;
+	let equipAreaIndex = this.GetEquipAreaIndex(equipArea);
+    let numSlots = ArraySize(this.m_equipment.equipAreas[equipAreaIndex].equipSlots);
+    let slotIndex = 0;
 
 	while slotIndex < numSlots {
 		let itemID: ItemID = this.m_equipment.equipAreas[equipAreaIndex].equipSlots[slotIndex].itemID;
@@ -54,11 +37,10 @@ public func GetActiveItem(equipArea: gamedataEquipmentArea, requiredTags: array<
 		slotIndex += 1;
 	}
 
-	let noneItemID: ItemID;
-	return noneItemID;
+	return ItemID.None();
 }
 
-// Override equip method to unequip conflicting items from all slots with extended rules.
+// Overrides equip method to automatically unequip conflicting items.
 @wrapMethod(EquipmentSystemPlayerData)
 private final func EquipItem(itemID: ItemID, slotIndex: Int32, opt blockActiveSlotsUpdate: Bool, opt forceEquipWeapon: Bool) {
 	this.UnequipConflictingItems(itemID);
@@ -66,11 +48,11 @@ private final func EquipItem(itemID: ItemID, slotIndex: Int32, opt blockActiveSl
 	wrappedMethod(itemID, slotIndex, blockActiveSlotsUpdate, forceEquipWeapon);
 }
 
-// Unequip conflicting items with extended rules.
+// Unequips conflicting items.
 // Sandevistan and Berserk are considered to be conflicting items.
 @addMethod(EquipmentSystemPlayerData)
 private func UnequipConflictingItems(itemID: ItemID) {
-	let equipArea: gamedataEquipmentArea = EquipmentSystem.GetEquipAreaType(itemID);
+	let equipArea = EquipmentSystem.GetEquipAreaType(itemID);
 
 	if Equals(equipArea, gamedataEquipmentArea.SystemReplacementCW) {
 		if EquipmentSystem.IsItemSandevistan(itemID) {
@@ -82,18 +64,18 @@ private func UnequipConflictingItems(itemID: ItemID) {
 	}
 }
 
-// Unequip items that has the specified tag.
+// Unequips items that has the specified tag.
 @addMethod(EquipmentSystemPlayerData)
 private func UnequipTaggedItems(equipArea: gamedataEquipmentArea, requiredTag: CName) {
 	let requiredTags: array<CName>;
 	ArrayPush(requiredTags, requiredTag);
 
-	let equipAreaIndex: Int32 = this.GetEquipAreaIndex(equipArea);
-	let numSlots: Int32 = ArraySize(this.m_equipment.equipAreas[equipAreaIndex].equipSlots);
-	let slotIndex: Int32 = 0;
+	let equipAreaIndex = this.GetEquipAreaIndex(equipArea);
+	let numSlots = ArraySize(this.m_equipment.equipAreas[equipAreaIndex].equipSlots);
+	let slotIndex = 0;
 
 	while slotIndex < numSlots {
-		let itemID: ItemID = this.m_equipment.equipAreas[equipAreaIndex].equipSlots[slotIndex].itemID;
+		let itemID = this.m_equipment.equipAreas[equipAreaIndex].equipSlots[slotIndex].itemID;
 
 		if ItemID.IsValid(itemID) && this.CheckTagsInItem(itemID, requiredTags) {
 			this.UnequipItem(equipAreaIndex, slotIndex);

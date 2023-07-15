@@ -1,5 +1,4 @@
-
-// Override the display of the selected cyberware to fix the duplicate bug.
+// Overrides the display of the selected cyberware to fix the duplicate bug.
 // Originally the game duplicates the selected item multiple times for each slot
 // available for the current equipment area.
 @replaceMethod(InventoryCyberwareItemChooser)
