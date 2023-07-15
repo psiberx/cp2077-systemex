@@ -16,19 +16,6 @@ public final func OnRestored() {
 	wrappedMethod();
 }
 
-// Find the area index in the equipment data.
-@addMethod(EquipmentSystemPlayerData)
-private func GetEquipAreaIndexByType(areaType: gamedataEquipmentArea) -> Int32 {
-	let i: Int32 = 0;
-	while i < ArraySize(this.m_equipment.equipAreas) {
-		if Equals(this.m_equipment.equipAreas[i].areaType, areaType) {
-			return i;
-		}
-		i += 1;
-	}
-	return -1;
-}
-
 // Override how the active item is resolved for the system replacement slot so that
 // it returns a Cyberdeck installed in any slot.
 // Originally the game always returns the cyberware installed in the first slot.
