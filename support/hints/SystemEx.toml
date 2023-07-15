@@ -1,0 +1,14 @@
+[[UNRESOLVED_METHOD]]
+id = "SYSTEMEX_MIX"
+line_contains = "SystemEx.GetInstance"
+message = "Remove r6/scripts/SystemEx and clean install the latest version of System-EX without third-party patches"
+
+[[UNRESOLVED_METHOD]]
+id = "SYSTEMEX_MIX"
+line_contains = "this.m_slotManager.GetSlotState"
+message = "Remove r6/scripts/SystemEx directory and clean install the latest version of System-EX without third-party patches"
+
+[[UNRESOLVED_METHOD]]
+id = "SYSTEMEX_MIX"
+span_starts_with = "SystemEx.ThreeOfSlots"
+message = "Remove r6/scripts/SystemEx directory and clean install the latest version of System-EX without third-party patches"
