@@ -3,6 +3,9 @@ import SystemEx.*
 @addField(RipperDocGameController)
 private let m_slotManager: ref<SlotManager>;
 
+@addField(RipperDocGameController)
+private let m_confirmationToken: ref<inkGameNotificationToken>;
+
 // Overrides intitialization of RipperDoc screen to create slot manager
 // and add fluff text for detecting if System-EX is active.
 @wrapMethod(RipperDocGameController)
@@ -89,8 +92,6 @@ private final func SetInventoryItemButtonHintsHoverOver(displayingData: Inventor
 
 		if Equals(this.m_mode, RipperdocModes.Default) {
 			let slotState = this.m_slotManager.GetOverridableSlotState(displayingData.EquipmentArea);
-			P(s"\(slotState)");
-
 			if slotState.isOverridable {
 				// cursorData = new MenuCursorUserData();
 				// cursorData.SetAnimationOverride(n"hoverOnHoldToComplete");
@@ -99,14 +100,14 @@ private final func SetInventoryItemButtonHintsHoverOver(displayingData: Inventor
 				if slotState.currentSlots != slotState.defaultSlots {
 					this.m_buttonHintsController.AddButtonHint(n"disassemble_item", 
 						// "[" + GetLocalizedText("Gameplay-Devices-Interactions-Helpers-Hold") + "] " + 
-						GetLocalizedTextByKey(n"Gameplay-Devices-Interactions-Reset"));
+						GetLocalizedTextByKey(n"UI-ResourceExports-Reset"));
 					// cursorData.AddAction(n"disassemble_item");
 				}
 				
 				if slotState.currentSlots < slotState.maxSlots {
 					this.m_buttonHintsController.AddButtonHint(n"upgrade_perk", 
 						// "[" + GetLocalizedText("Gameplay-Devices-Interactions-Helpers-Hold") + "] " + 
-						GetLocalizedTextByKey(n"Gameplay-Devices-Interactions-Override"));
+						GetLocalizedTextByKey(n"UI-Crafting-Upgrade"));
 					// cursorData.AddAction(n"upgrade_perk");
 				}
 			}
@@ -122,13 +123,61 @@ protected cb func OnPreviewCyberwareClick(evt: ref<inkPointerEvent>) -> Bool {
 
 	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) && Equals(this.m_mode, RipperdocModes.Default) {
 		let areaType = this.GetCyberwareSlotControllerFromTarget(evt).GetEquipmentArea();
+		let slotState = this.m_slotManager.GetOverridableSlotState(areaType);
 		
-		if evt.IsAction(n"upgrade_perk") {
-			this.m_slotManager.OverrideSlot(areaType);
-			this.UpdateCWAreaGrid(areaType);
-		} else if evt.IsAction(n"disassemble_item") {
-			this.m_slotManager.ResetSlot(areaType);
-			this.UpdateCWAreaGrid(areaType);
+		switch (true) {
+			case evt.IsAction(n"upgrade_perk"):
+				if slotState.currentSlots < slotState.maxSlots {
+					if slotState.canBuyOverride {
+						this.m_confirmationToken = ConfirmationPopup.Show(this, OperrideAction.Override, slotState);
+						this.m_confirmationToken.RegisterListener(this, n"OnSlotOverrideConfirmed");
+					} else {
+						this.ShowNotEnoughMoneyNotification();
+					}
+				}
+				break;
+			case evt.IsAction(n"disassemble_item"):
+				if slotState.currentSlots != slotState.defaultSlots {
+					if slotState.canBuyReset {
+						this.m_confirmationToken = ConfirmationPopup.Show(this, OperrideAction.Reset, slotState);
+						this.m_confirmationToken.RegisterListener(this, n"OnSlotResetConfirmed");
+					} else {
+						this.ShowNotEnoughMoneyNotification();
+					}
+				}
+				break;
 		}
 	}
+}
+
+@addMethod(RipperDocGameController)	
+protected func ShowNotEnoughMoneyNotification() {
+	let notification = new UIMenuNotificationEvent();
+	notification.m_notificationType = UIMenuNotificationType.VNotEnoughMoney;
+	
+	this.QueueEvent(notification);
+}
+
+@addMethod(RipperDocGameController)
+protected cb func OnSlotOverrideConfirmed(data: ref<inkGameNotificationData>) -> Bool {
+    if ConfirmationPopup.IsConfirmed(data) {
+		let areaType = ConfirmationPopup.GetAreaType(data);
+
+		this.m_slotManager.OverrideSlot(areaType);
+		this.UpdateCWAreaGrid(areaType);
+    }
+
+	this.m_confirmationToken = null;
+}
+
+@addMethod(RipperDocGameController)
+protected cb func OnSlotResetConfirmed(data: ref<inkGameNotificationData>) -> Bool {
+    if ConfirmationPopup.IsConfirmed(data) {
+		let areaType = ConfirmationPopup.GetAreaType(data);
+
+		this.m_slotManager.ResetSlot(areaType);
+		this.UpdateCWAreaGrid(areaType);
+    }
+
+	this.m_confirmationToken = null;
 }

@@ -7,8 +7,8 @@ public class SlotState {
 	public let defaultSlots: Int32;
     public let maxSlots: Int32;
 	public let isOverridable: Bool;
-	public let canOverride: Bool;
-	public let canReset: Bool;
+	public let canBuyOverride: Bool;
+	public let canBuyReset: Bool;
 }
 
 public class SlotManager {
@@ -31,29 +31,44 @@ public class SlotManager {
 			slotState.defaultSlots = slotInfo.defaultSlots;
 			slotState.maxSlots = slotInfo.maxSlots;
 			slotState.isOverridable = true;
-			slotState.canOverride = true; // TODO: Check money
-			slotState.canReset = true; // TODO: Check money
+
+			let playerMoney = GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame())
+				.GetItemQuantity(this.m_playerData.m_owner, MarketSystem.Money());
+
+			slotState.canBuyOverride = (playerMoney >= SlotConfig.OverridePrice());
+			slotState.canBuyReset = (playerMoney >= SlotConfig.ResetPrice());
 		}
 
 		return slotState;
 	}
 
-	public func OverrideSlot(areaType: gamedataEquipmentArea) -> Bool {
+	public func OverrideSlot(areaType: gamedataEquipmentArea, opt free: Bool) -> Bool {
 		let slotState = this.GetOverridableSlotState(areaType);
 
-		if !slotState.isOverridable || !slotState.canOverride || slotState.currentSlots == slotState.maxSlots {
+		if !slotState.isOverridable || slotState.currentSlots == slotState.maxSlots {
+			return false;
+		}
+
+		if !slotState.canBuyOverride && !free {
 			return false;
 		}
 
 		ArrayResize(this.m_playerData.m_equipment.equipAreas[slotState.areaIndex].equipSlots, slotState.currentSlots + 1);
 
+		GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame())
+			.RemoveItem(this.m_playerData.m_owner, MarketSystem.Money(), SlotConfig.OverridePrice());
+
 		return true;
 	}
 
-	public func ResetSlot(areaType: gamedataEquipmentArea) -> Bool {
+	public func ResetSlot(areaType: gamedataEquipmentArea, opt free: Bool) -> Bool {
 		let slotState = this.GetOverridableSlotState(areaType);
 
-		if !slotState.isOverridable || !slotState.canReset || slotState.currentSlots == slotState.defaultSlots {
+		if !slotState.isOverridable || slotState.currentSlots == slotState.defaultSlots {
+			return false;
+		}
+
+		if !slotState.canBuyReset && !free {
 			return false;
 		}
 
@@ -66,6 +81,9 @@ public class SlotManager {
 		}
 
 		ArrayResize(this.m_playerData.m_equipment.equipAreas[slotState.areaIndex].equipSlots, slotState.defaultSlots);
+
+		GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame())
+			.RemoveItem(this.m_playerData.m_owner, MarketSystem.Money(), SlotConfig.ResetPrice());
 
 		return true;
 	}
