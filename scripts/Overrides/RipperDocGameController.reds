@@ -1,6 +1,28 @@
+// Adds fluff text to RipperDoc screen to detect if System-EX is active.
+@wrapMethod(RipperDocGameController)
+private final func Init() {
+    wrappedMethod();
 
-// Override the initialization of the cyberware grid so that it correctly displays the number of available mods
-// when there is more than one slot for the equipment area.
+    if IsDefined(this.m_ripperId) {
+        let text = new inkText();
+        text.SetFontFamily("base\\gameplay\\gui\\fonts\\raj\\raj.inkfontfamily");
+        text.SetFontStyle(n"Regular");
+        text.SetFontSize(28);
+        text.SetOpacity(0.1);
+        text.SetAnchor(inkEAnchor.TopRight);
+        text.SetAnchorPoint(new Vector2(1.0, 0.0));
+        text.SetMargin(new inkMargin(0, 160, 4, 0));
+        text.SetHorizontalAlignment(textHorizontalAlignment.Left);
+        text.SetVerticalAlignment(textVerticalAlignment.Top);
+        text.SetStyle(r"base\\gameplay\\gui\\common\\main_colors.inkstyle");
+        text.BindProperty(n"tintColor", n"MainColors.Red");
+        text.SetText("POWERED BY SYSTEM-EX");
+        text.Reparent(this.m_ripperId.GetRootCompoundWidget());
+    }
+}
+
+// Overrides initialization of the cyberware grid so that it correctly displays the number of available mods
+// when there is more than one slot per equipment area.
 @wrapMethod(RipperDocGameController)
 protected cb func OnGridSpawned(widget: ref<inkWidget>, userData: ref<IScriptable>) -> Bool {
 	wrappedMethod(widget, userData);
