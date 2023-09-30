@@ -15,7 +15,7 @@ protected final const func EnterCondition(const stateContext: ref<StateContext>,
 
 			if applyTimeDilationToPlayer {
 				if this.IsTimeDilationActive(stateContext, scriptInterface, TimeDilationHelper.GetSandevistanKey()) {
-					timeSystem.SetTimeDilationOnLocalPlayerZero(TimeDilationHelper.GetSandevistanKey(), 1.0, 999.0, n"", n"", true);
+					timeSystem.SetTimeDilationOnLocalPlayerZero(TimeDilationHelper.GetSandevistanKey(), 1.0, 999.0, n"", n"");
 				} else {
 					timeSystem.UnsetTimeDilationOnLocalPlayerZero(easeOutCurve);
 				}
@@ -45,7 +45,7 @@ protected final const func EnterCondition(const stateContext: ref<StateContext>,
     		timeSystem.SetTimeDilation(TimeDilationHelper.GetFocusModeKey(), timeDilation, 999.0, easeInCurve, easeOutCurve);
 
 			if applyTimeDilationToPlayer {
-				timeSystem.SetTimeDilationOnLocalPlayerZero(TimeDilationHelper.GetFocusModeKey(), playerDilation, 999.0, easeInCurve, easeOutCurve, true);
+				timeSystem.SetTimeDilationOnLocalPlayerZero(TimeDilationHelper.GetFocusModeKey(), playerDilation, 999.0, easeInCurve, easeOutCurve);
 			}
 		}
 

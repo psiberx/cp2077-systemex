@@ -1,7 +1,7 @@
 import SystemEx.*
 
 public abstract class SystemEx {
-    public static func Version() -> String = "1.1.0"
+    public static func Version() -> String = "1.2.0"
 
     public static func UpgradeAllSlotsToMax(game: GameInstance) {
         let player = GetPlayer(game);

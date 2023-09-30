@@ -16,8 +16,12 @@ public class SlotManager {
 	private let m_playerData: ref<EquipmentSystemPlayerData>;
 	
 	public func Initialize(playerData: ref<EquipmentSystemPlayerData>) {
-		this.m_overridableSlots = SlotConfig.OverridableSlots();
 		this.m_playerData = playerData;
+		this.m_overridableSlots = SlotConfig.OverridableSlots();
+		for slot in this.m_overridableSlots {
+			let areaRecord = this.m_playerData.GetEquipAreaRecordByType(slot.areaType);
+			slot.defaultSlots = areaRecord.GetEquipSlotsCount();
+		}
 	}
 	
 	public func GetSlotState(areaType: gamedataEquipmentArea) -> ref<SlotState> {
@@ -54,6 +58,8 @@ public class SlotManager {
 		}
 
 		ArrayResize(this.m_playerData.m_equipment.equipAreas[slotState.areaIndex].equipSlots, slotState.currentSlots + 1);
+		this.m_playerData.InitializeEquipSlotFromRecord(TDB.GetEquipSlotRecord(t"EquipmentArea.SimpleEquipSlot"),
+		    this.m_playerData.m_equipment.equipAreas[slotState.areaIndex].equipSlots[slotState.currentSlots]);
 
 		if !free {
 			let transactionSystem = GameInstance.GetTransactionSystem(this.m_playerData.m_owner.GetGame());

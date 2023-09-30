@@ -15,83 +15,32 @@ private final func Init() {
 	this.m_slotManager = new SlotManager();
 	this.m_slotManager.Initialize(EquipmentSystem.GetData(this.m_player));
 
-    if IsDefined(this.m_ripperId) {
-        let text = new inkText();
-        text.SetFontFamily("base\\gameplay\\gui\\fonts\\raj\\raj.inkfontfamily");
-        text.SetFontStyle(n"Regular");
-        text.SetFontSize(28);
-        text.SetOpacity(0.1);
-        text.SetAnchor(inkEAnchor.TopRight);
-        text.SetAnchorPoint(new Vector2(1.0, 0.0));
-        text.SetMargin(new inkMargin(0, 160, 4, 0));
-        text.SetHorizontalAlignment(textHorizontalAlignment.Left);
-        text.SetVerticalAlignment(textVerticalAlignment.Top);
-        text.SetStyle(r"base\\gameplay\\gui\\common\\main_colors.inkstyle");
-        text.BindProperty(n"tintColor", n"MainColors.Red");
-        text.SetText("POWERED BY SYSTEM-EX");
-        text.Reparent(this.m_ripperId.GetRootCompoundWidget());
-    }
-}
-
-// Overrides initialization of the cyberware grid so that it correctly displays the number of available mods
-// when there is more than one slot per equipment area.
-@wrapMethod(RipperDocGameController)
-protected cb func OnGridSpawned(widget: ref<inkWidget>, userData: ref<IScriptable>) -> Bool {
-	wrappedMethod(widget, userData);
-
-	if Equals(this.m_screen, CyberwareScreenType.Inventory) {
-		let gridUserData: ref<GridUserData> = userData as GridUserData;
-		let minigridController: ref<CyberwareInventoryMiniGrid> = widget.GetController() as CyberwareInventoryMiniGrid;
-		minigridController.UpdateTitles(this.GetAmountOfModsInArea(gridUserData.equipArea), this.m_screen);
-	}
-}
-
-// Overrides initialization of the cyberware grid so that it correctly displays the number of available mods
-// when there is more than one slot per equipment area.
-@wrapMethod(RipperDocGameController)
-private final func UpdateCWAreaGrid(selectedArea: gamedataEquipmentArea) {
-	wrappedMethod(selectedArea);
-
-	if Equals(this.m_screen, CyberwareScreenType.Inventory) {
-		for minigridController in this.m_cybewareGrids {
-			if Equals(minigridController.GetEquipementArea(), selectedArea) {
-				minigridController.UpdateTitles(this.GetAmountOfModsInArea(selectedArea), this.m_screen);
-				break;
-			}
-		}
-	}
-}
-
-// Calculates the number of mods available for all items in the specified equipment area.
-@addMethod(RipperDocGameController)
-private final func GetAmountOfModsInArea(equipArea: gamedataEquipmentArea) -> Int32 {
-	let numSlots = this.m_InventoryManager.GetNumberOfSlots(equipArea);
-	let slotIndex = 0;
-	let modsCount = 0;
-
-	while slotIndex < numSlots {
-		let equippedData: InventoryItemData = this.m_InventoryManager.GetItemDataEquippedInArea(equipArea, slotIndex);
-
-		if !InventoryItemData.IsEmpty(equippedData) {
-			modsCount += this.GetAmountOfMods(equippedData);
-		}
-
-		slotIndex += 1;
-	}
-
-	return modsCount;
+    let text = new inkText();
+    text.SetFontFamily("base\\gameplay\\gui\\fonts\\raj\\raj.inkfontfamily");
+    text.SetFontStyle(n"Regular");
+    text.SetFontSize(28);
+    text.SetOpacity(0.1);
+    text.SetAnchor(inkEAnchor.TopRight);
+    text.SetAnchorPoint(new Vector2(1.0, 0.0));
+    text.SetMargin(new inkMargin(0, 160, 100, 0));
+    text.SetHorizontalAlignment(textHorizontalAlignment.Left);
+    text.SetVerticalAlignment(textVerticalAlignment.Top);
+    text.SetStyle(r"base\\gameplay\\gui\\common\\main_colors.inkstyle");
+    text.BindProperty(n"tintColor", n"MainColors.Red");
+    text.SetText("POWERED BY SYSTEM-EX");
+    text.Reparent(this.GetRootCompoundWidget());
 }
 
 @wrapMethod(RipperDocGameController)
-private final func SetInventoryItemButtonHintsHoverOver(displayingData: InventoryItemData) {
-	wrappedMethod(displayingData);
+protected cb func OnSlotHover(evt: ref<ItemDisplayHoverOverEvent>) -> Bool {
+	wrappedMethod(evt);
 
 	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) {
 		// let cursorContext = n"Hover";
 		// let cursorData: ref<MenuCursorUserData>;
 
-		if Equals(this.m_mode, RipperdocModes.Default) {
-			let slotState = this.m_slotManager.GetSlotState(displayingData.EquipmentArea);
+		if Equals(this.m_filterMode, RipperdocModes.Default) {
+			let slotState = this.m_slotManager.GetSlotState(evt.display.GetEquipmentArea());
 			if slotState.isOverridable {
 				// cursorData = new MenuCursorUserData();
 				// cursorData.SetAnimationOverride(n"hoverOnHoldToComplete");
@@ -105,10 +54,10 @@ private final func SetInventoryItemButtonHintsHoverOver(displayingData: Inventor
 				}
 				
 				if slotState.currentSlots < slotState.maxSlots {
-					this.m_buttonHintsController.AddButtonHint(n"upgrade_perk", 
+					this.m_buttonHintsController.AddButtonHint(n"drop_item", 
 						// "[" + GetLocalizedText("Gameplay-Devices-Interactions-Helpers-Hold") + "] " + 
-						GetLocalizedTextByKey(n"UI-Crafting-Upgrade"));
-					// cursorData.AddAction(n"upgrade_perk");
+						GetLocalizedTextByKey(n"UI-ResourceExports-Buy"));
+					// cursorData.AddAction(n"drop_item");
 				}
 			}
 		}
@@ -118,15 +67,22 @@ private final func SetInventoryItemButtonHintsHoverOver(displayingData: Inventor
 }
 
 @wrapMethod(RipperDocGameController)
+private final func SetButtonHintsUnhover() {
+    wrappedMethod();
+
+    this.m_buttonHintsController.RemoveButtonHint(n"drop_item");
+}
+
+@wrapMethod(RipperDocGameController)
 protected cb func OnPreviewCyberwareClick(evt: ref<inkPointerEvent>) -> Bool {
 	wrappedMethod(evt);
 
-	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) && Equals(this.m_mode, RipperdocModes.Default) {
+	if Equals(this.m_screen, CyberwareScreenType.Ripperdoc) && Equals(this.m_filterMode, RipperdocModes.Default) {
 		let areaType = this.GetCyberwareSlotControllerFromTarget(evt).GetEquipmentArea();
 		let slotState = this.m_slotManager.GetSlotState(areaType);
 		
 		switch (true) {
-			case evt.IsAction(n"upgrade_perk"):
+			case evt.IsAction(n"drop_item"):
 				if slotState.currentSlots < slotState.maxSlots {
 					if slotState.canBuyOverride {
 						this.m_confirmationToken = ConfirmationPopup.Show(this, OperrideAction.Upgrade, slotState);
@@ -167,8 +123,7 @@ protected cb func OnSlotUpgradeConfirmed(data: ref<inkGameNotificationData>) -> 
 			: null;
 
 		this.m_slotManager.UpgradeSlot(areaType, false, vendor);
-		this.UpdateCWAreaGrid(areaType);
-		this.UpdateMoney();
+		this.UpdateMinigrids();
     }
 
 	this.m_confirmationToken = null;
@@ -183,8 +138,7 @@ protected cb func OnSlotResetConfirmed(data: ref<inkGameNotificationData>) -> Bo
 			: null;
 
 		this.m_slotManager.ResetSlot(areaType, false, vendor);
-		this.UpdateCWAreaGrid(areaType);
-		this.UpdateMoney();
+		this.UpdateMinigrids();
     }
 
 	this.m_confirmationToken = null;

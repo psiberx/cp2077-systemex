@@ -16,14 +16,15 @@ public abstract class SlotConfig {
 
     public static func OverridableSlots() -> array<OverridableSlotInfo> = [
         new OverridableSlotInfo(gamedataEquipmentArea.FrontalCortexCW, 3, 6),
-        //new OverridableSlotInfo(gamedataEquipmentArea.EyesCW, 1, 3),
-        new OverridableSlotInfo(gamedataEquipmentArea.CardiovascularSystemCW, 3, 6),
+        //new OverridableSlotInfo(gamedataEquipmentArea.EyesCW, 2, 2),
+        //new OverridableSlotInfo(gamedataEquipmentArea.FaceCW, 1, 1),
+        new OverridableSlotInfo(gamedataEquipmentArea.CardiovascularSystemCW, 3, 6), // Circulatory system
         new OverridableSlotInfo(gamedataEquipmentArea.ImmuneSystemCW, 2, 6),
-        new OverridableSlotInfo(gamedataEquipmentArea.NervousSystemCW, 2, 6),
-        new OverridableSlotInfo(gamedataEquipmentArea.IntegumentarySystemCW, 3, 6),      
+        new OverridableSlotInfo(gamedataEquipmentArea.NervousSystemCW, 3, 6),
+        new OverridableSlotInfo(gamedataEquipmentArea.IntegumentarySystemCW, 3, 6),
         new OverridableSlotInfo(gamedataEquipmentArea.SystemReplacementCW, 1, 3),
-        new OverridableSlotInfo(gamedataEquipmentArea.MusculoskeletalSystemCW, 2, 6),
-        new OverridableSlotInfo(gamedataEquipmentArea.HandsCW, 1, 3),
+        new OverridableSlotInfo(gamedataEquipmentArea.MusculoskeletalSystemCW, 3, 6),
+        //new OverridableSlotInfo(gamedataEquipmentArea.HandsCW, 2, 2),
         new OverridableSlotInfo(gamedataEquipmentArea.ArmsCW, 1, 4),
         new OverridableSlotInfo(gamedataEquipmentArea.LegsCW, 1, 2)
     ];

@@ -82,3 +82,38 @@ private func UnequipTaggedItems(equipArea: gamedataEquipmentArea, requiredTag: C
 		slotIndex += 1;
 	}
 }
+
+@wrapMethod(EquipmentSystemPlayerData)
+private final const func IsSlotLocked(slot: SEquipSlot, out visibleWhenLocked: Bool) -> Bool {
+    if IsDefined(slot.unlockPrereq) {
+        return wrappedMethod(slot, visibleWhenLocked);
+    }
+
+    visibleWhenLocked = false;
+    return true;
+}
+
+@replaceMethod(EquipmentSystemPlayerData)
+private final func InitializeEquipSlotsFromRecords(slotRecords: array<wref<EquipSlot_Record>>, out equipSlots: array<SEquipSlot>) -> Void {
+    let numberOfRecords = ArraySize(slotRecords);
+    let numberOfSlots = ArraySize(equipSlots);
+    let finalSize = Max(numberOfRecords, numberOfSlots);
+    let i = 0;
+    while i < finalSize {
+        if i < numberOfRecords {
+            let equipSlot: SEquipSlot;
+            this.InitializeEquipSlotFromRecord(slotRecords[i], equipSlot);
+            if i <= ArraySize(equipSlots) {
+                if !IsDefined(equipSlot.unlockPrereq) || equipSlot.unlockPrereq.IsFulfilled(this.m_owner.GetGame(), this.m_owner) {
+                    equipSlot.itemID = equipSlots[i].itemID;
+                }
+                equipSlots[i] = equipSlot;
+            } else {
+                ArrayPush(equipSlots, equipSlot);
+            }
+        } else {
+            this.InitializeEquipSlotFromRecord(TDB.GetEquipSlotRecord(t"EquipmentArea.SimpleEquipSlot"), equipSlots[i]);
+        }
+        i += 1;
+    }
+}
